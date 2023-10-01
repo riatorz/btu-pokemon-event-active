@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pokemon Event BTÜ</title>
+    <style>
+      #en-yuksek-liste{
+        position: absolute;
+        top: 1%;
+        left: 1%;
+        list-style: none;
+        font-size: 1.5rem;
+      }
+    </style>
+  </head>
+  <body style="margin: 0; overflow: hidden">
+    
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.0.8/aframe/build/aframe-ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <ul id="en-yuksek-liste"></ul>
+    <a-scene arjs="detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+      <!-- 10 değerine sahip bir barkod için içerik -->
+      <a-marker type="barcode" value="5" name="charmander">
+        <!-- .obj dosyasını görüntülemek için a-entity kullanın -->
+        <a-entity
+          position="0 0.5 0"
+          scale="1 1 1"
+          rotation="0 0 0"
+          obj-model="obj: url(pokemons/charmander/charmander.obj); mtl: url(pokemons/charmander/charmander.mtl);"
+        ></a-entity>
+      </a-marker>
+
+      <a-marker type="barcode" value="10" name="pikachu">
+        <!-- .obj dosyasını görüntülemek için a-entity kullanın -->
+        <a-entity
+          position="0 0.5 0"
+          scale="1 1 1"
+          rotation="1 0 0"
+          obj-model="obj: url(pokemons/pikachu/pikachu.obj); mtl: url(pokemons/pikachu/pikachu.mtl);"
+        ></a-entity>
+      </a-marker>
+
+      <a-marker type="barcode" value="21" name="tangle">
+        <!-- .obj dosyasını görüntülemek için a-entity kullanın -->
+        <a-gltf-model
+          position="0 0.5 0"
+          scale="0.5 0.5 0.5"
+          rotation="0 0 0"
+          src="url(pokemons/tangela/scene.gltf)"
+        ></a-gltf-model>
+      </a-marker>
+      <a-marker type="barcode" value="20" name="snorlax">
+        <!-- .obj dosyasını görüntülemek için a-entity kullanın -->
+        <a-entity
+          position="0 0.5 0"
+          scale="2 2 2"
+          rotation="1 0 0"
+          obj-model="obj: url(pokemons/snorlax/_snorlax.obj); mtl: url(pokemons/snorlax/_snorlax.mtl);"
+        ></a-entity>
+      </a-marker>
+
+      <a-marker type="barcode" value="22" name="diglett">
+        <!-- .obj dosyasını görüntülemek için a-entity kullanın -->
+        <a-entity
+          position="0 0.5 0"
+          scale="1 1 1"
+          rotation="1 0 0"
+          obj-model="obj: url(pokemons/diglett/diglett.obj); mtl: url(pokemons/diglett/diglett.mtl);"
+        ></a-entity>
+      </a-marker>
+
+      <a-marker type="barcode" value="23" name="marill">
+        <!-- .obj dosyasını görüntülemek için a-entity kullanın -->
+        <a-entity
+          position="0 0.5 0"
+          scale="1 1 1"
+          rotation="1 0 0"
+          obj-model="obj: url(pokemons/marill/marill.obj); mtl: url(pokemons/marill/marill.mtl);"
+        ></a-entity>
+      </a-marker>
+      <a-marker type="barcode" value="24" name="cubone">
+        <!-- .obj dosyasını görüntülemek için a-entity kullanın -->
+        <a-entity
+          position="0 0.5 0"
+          scale="1 1 1"
+          rotation="1 0 0"
+          obj-model="obj: url(pokemons/cubone/cubone.obj); mtl: url(pokemons/cubone/cubone.mtl);"
+        ></a-entity>
+      </a-marker>
+
+      <a-entity camera> </a-entity>
+    </a-scene>
+    <script>
+      axios.get("https://btu-pokemon-event.onrender.com/en-yuksek-yakalama-oranlari")
+      .then((response) => {
+    const enYuksekOranlar = response.data;
+    
+    // Sonuçları ekranda göster
+    const listeElementi = document.getElementById("en-yuksek-liste");
+    enYuksekOranlar.forEach((kullanici, index) => {
+      const listItem = document.createElement("li");
+      listItem.textContent = `${index + 1}. ${kullanici.nickname} - Yakalanan Pokemon Sayısı: ${kullanici.yakalananPokemonlar.length}`;
+      listeElementi.appendChild(listItem);
+    });
+  })
+  .catch((error) => {
+    console.error("Hata:", error);
+  });
+      const ogrenciNo = localStorage.getItem("ogrenciNo");
+      if (ogrenciNo) {
+        console.log("Kullanıcı Öğrenci No:", ogrenciNo);
+      } else {
+        const ogrenciNo = prompt("Lütfen öğrenci numaranızı girin:");
+        if (ogrenciNo) {
+          localStorage.setItem("ogrenciNo", ogrenciNo);
+        } else {
+          alert("Öğrenci numarası girmeniz gerekmektedir.");
+        }
+      }
+
+      function handleBarcodeDetection(event) {
+        const pokemonName = event.target.getAttribute("name");
+        const xhr = new XMLHttpRequest();
+        // Yakalanan pokemonun adını ve kullanıcının öğrenci numarasını API'ye gönderin
+        xhr.open(
+    "GET",
+    `https://btu-pokemon-event.onrender.com/pokemon-ekle?ogrenciNo=${ogrenciNo}&yeniPokemon=${pokemonName}`,
+    true
+  );
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      // Başarı mesajını işle
+      const response = JSON.parse(xhr.responseText);
+      alert(response.message);
+    }
+  };
+
+  xhr.send();}
+      const barcodeMarkers = document.querySelectorAll(
+        'a-marker[type="barcode"]'
+      );
+      barcodeMarkers.forEach((marker) => {
+        marker.addEventListener("markerFound", handleBarcodeDetection);
+      });
+    </script>
+  </body>
+</html>
